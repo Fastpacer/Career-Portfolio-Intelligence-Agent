@@ -26,37 +26,21 @@ to identify improvement opportunities and generate actionable career guidance.
 """
 )
 
-# Sidebar inputs
 st.sidebar.header("Profile Inputs")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload CV (PDF)",
-    type=["pdf"]
-)
-
-github_username = st.sidebar.text_input(
-    "GitHub Username"
-)
-
-target_role = st.sidebar.text_input(
-    "Target Role",
-    value="Software Engineer"
-)
-
+uploaded_file = st.sidebar.file_uploader("Upload CV (PDF)", type=["pdf"])
+github_username = st.sidebar.text_input("GitHub Username")
+target_role = st.sidebar.text_input("Target Role", value="Software Engineer")
 analyze_button = st.sidebar.button("Analyze Profile")
 
 
 def extract_cv_text(file):
-
     text = ""
-
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
             page_text = page.extract_text()
-
             if page_text:
                 text += page_text
-
     return text
 
 
@@ -83,9 +67,7 @@ if analyze_button:
                 )
 
                 st.success("Analysis complete")
-
                 st.markdown("## Career Strategy Report")
-
                 st.markdown(result)
 
             except Exception as e:

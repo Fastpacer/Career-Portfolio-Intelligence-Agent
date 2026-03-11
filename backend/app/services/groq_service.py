@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from groq import Groq
 
 env_path = Path(__file__).resolve().parents[2] / ".env"
-load_dotenv(env_path)
+load_dotenv(env_path,override=True)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL_NAME = os.getenv("MODEL_NAME", "llama3-8b-8192")
+MODEL_NAME = os.getenv("MODEL_NAME", "moonshotai/kimi-k2-instruct-0905")
 
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY not found in environment variables")
