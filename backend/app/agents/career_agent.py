@@ -4,14 +4,15 @@ from app.services.groq_service import ask_llm
 
 def generate_career_strategy(cv_text, github_username, target_role):
 
-    # Slightly smaller CV slice to free tokens for generation
-    cv_text = cv_text[:3000]
+    # Limit CV size to control token usage
+    cv_text = cv_text[:3500]
 
     github_data = fetch_repositories(github_username)
 
     repos = github_data.get("repos", [])
     summary = github_data.get("summary", {})
 
+    # Convert language stats into readable format
     languages_dict = summary.get("top_languages", {})
 
     languages_text = ", ".join(
@@ -35,12 +36,16 @@ def generate_career_strategy(cv_text, github_username, target_role):
         repo_text = "No significant repositories found."
 
     prompt = f"""
-You are a **senior technical recruiter and career advisor**.
+You are a senior technical recruiter and career advisor.
 
-Evaluate the candidate's **skills, projects, and resume quality**
-relative to their **target role**.
+Your task is to evaluate a candidate's profile and provide both **scores and career improvement insights**.
 
-Think like an experienced recruiter evaluating a candidate for hiring.
+The evaluation should consider:
+
+• CV quality and structure  
+• skill alignment with the target role  
+• GitHub portfolio strength  
+• project relevance and complexity  
 
 --------------------------------
 
@@ -65,15 +70,19 @@ Target Role:
 
 --------------------------------
 
-Your task is to produce a structured evaluation.
+Provide output using the following structure.
 
-IMPORTANT RULES:
+## Career Profile Scores
 
-- All 4 sections must be present.
-- Keep responses concise but insightful.
-- Maximum 5 bullet points per section.
-- Avoid tables.
-- Use bullet points where possible.
+ATS Readiness Score: <0-100>
+
+Portfolio Strength Score: <0-100>
+
+Skill Alignment Score: <0-100>
+
+Overall Career Readiness Score: <0-100>
+
+Briefly explain why these scores were assigned.
 
 --------------------------------
 
@@ -89,35 +98,31 @@ For each skill explain briefly:
 
 ## 2. Portfolio Improvements
 
-Evaluate the GitHub projects.
+Evaluate the GitHub projects and suggest improvements such as:
 
-Focus specifically on:
-
-- project diversity
-- real-world usefulness
-- code quality signals
-- missing project types
-- documentation quality
+- stronger project types
+- missing technologies
+- improving documentation
+- demonstrating real-world impact
+- improving code quality
 
 --------------------------------
 
 ## 3. Resume Improvements
 
-Suggest improvements related to:
+Suggest concrete improvements for:
 
-- structure
-- clarity
+- resume structure
+- clarity of experience
 - measurable achievements
 - missing sections
-- highlighting strongest projects
+- highlighting important projects
 
 --------------------------------
 
 ## 4. 30-Day Learning Roadmap
 
-Provide a structured **4-week roadmap**.
-
-Use this exact format:
+Provide a structured **4-week roadmap** using this exact format:
 
 Week 1
 Focus:
@@ -149,7 +154,11 @@ Actions:
 
 --------------------------------
 
-Ensure all four sections are completed before finishing the answer.
+Guidelines:
+
+- Avoid tables
+- Keep answers concise but insightful
+- Ensure all sections are completed
 """
 
     return ask_llm(prompt)
