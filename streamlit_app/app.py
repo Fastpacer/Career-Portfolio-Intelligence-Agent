@@ -1,8 +1,12 @@
 import streamlit as st
 import pdfplumber
-import requests
+import sys
+import os
 
-API_URL = "http://127.0.0.1:8000/analyze"
+# Allow Streamlit to import backend modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from backend.app.agents.career_agent import generate_career_strategy
 
 st.set_page_config(
     page_title="Career Portfolio Intelligence Agent",
@@ -47,9 +51,7 @@ def extract_cv_text(file):
     text = ""
 
     with pdfplumber.open(file) as pdf:
-
         for page in pdf.pages:
-
             page_text = page.extract_text()
 
             if page_text:
@@ -63,31 +65,30 @@ if analyze_button:
     if uploaded_file is None:
         st.error("Please upload a CV PDF")
 
-    elif github_username == "":
+    elif github_username.strip() == "":
         st.error("Please enter your GitHub username")
 
     else:
 
         with st.spinner("Analyzing your career profile..."):
 
-            cv_text = extract_cv_text(uploaded_file)
+            try:
 
-            payload = {
-                "cv_text": cv_text,
-                "github_username": github_username,
-                "target_role": target_role
-            }
+                cv_text = extract_cv_text(uploaded_file)
 
-            response = requests.post(API_URL, json=payload)
+                result = generate_career_strategy(
+                    cv_text=cv_text,
+                    github_username=github_username,
+                    target_role=target_role
+                )
 
-            if response.status_code != 200:
-                st.error("Backend error occurred")
-            else:
-
-                data = response.json()
-
-                result = data["career_strategy"]
+                st.success("Analysis complete")
 
                 st.markdown("## Career Strategy Report")
 
                 st.markdown(result)
+
+            except Exception as e:
+
+                st.error("An error occurred during analysis.")
+                st.exception(e)
