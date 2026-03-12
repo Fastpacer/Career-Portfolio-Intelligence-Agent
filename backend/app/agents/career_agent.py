@@ -1,5 +1,5 @@
-from backend.app.services.github_service import fetch_repositories
-from backend.app.services.groq_service import ask_llm
+from app.services.github_service import fetch_repositories
+from app.services.groq_service import ask_llm
 
 
 def generate_career_strategy(cv_text, github_username, target_role):
@@ -64,15 +64,12 @@ Overall Career Readiness Score: <0-100>
 Explain briefly why these scores were assigned.
 
 ## 1. Skill Gaps
-
 List missing or weak skills and why they matter.
 
 ## 2. Portfolio Improvements
-
 Suggest improvements to GitHub projects.
 
 ## 3. Resume Improvements
-
 Provide actionable resume improvements.
 
 ## 4. 30-Day Learning Roadmap
