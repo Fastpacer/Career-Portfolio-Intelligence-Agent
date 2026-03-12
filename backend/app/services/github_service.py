@@ -1,7 +1,7 @@
 import requests
 import os
 from collections import Counter
-from app.utils.logger import get_logger
+from backend.app.utils.logger import get_logger
 
 logger = get_logger()
 
@@ -19,19 +19,13 @@ def fetch_repositories(username: str):
 
         if response.status_code != 200:
             logger.error("GitHub API request failed")
-            return {
-                "repos": [],
-                "summary": {}
-            }
+            return {"repos": [], "summary": {}}
 
         repos = response.json()
 
     except Exception as e:
         logger.error(f"GitHub request error: {e}")
-        return {
-            "repos": [],
-            "summary": {}
-        }
+        return {"repos": [], "summary": {}}
 
     repos_sorted = sorted(
         repos,
@@ -42,7 +36,6 @@ def fetch_repositories(username: str):
     top_repos = repos_sorted[:5]
 
     processed_repos = []
-
     languages = []
     total_stars = 0
 

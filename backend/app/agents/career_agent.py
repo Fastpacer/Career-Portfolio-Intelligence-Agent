@@ -1,5 +1,5 @@
-from app.services.github_service import fetch_repositories
-from app.services.groq_service import ask_llm
+from backend.app.services.github_service import fetch_repositories
+from backend.app.services.groq_service import ask_llm
 
 
 def generate_career_strategy(cv_text, github_username, target_role):
