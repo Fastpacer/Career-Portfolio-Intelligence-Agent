@@ -11,9 +11,14 @@ venv/
 
 # Environment variables
 *.env
+!.env.example
 
-# Streamlit cache
-.streamlit/
+# Streamlit secrets (config.toml is committed)
+.streamlit/secrets.toml
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -46,5 +51,6 @@ build/
 # Node modules (in case frontend experiments exist)
 node_modules/
 
-# PDF test files
+# PDFs (real CVs must never be committed); test fixtures are allowed
 *.pdf
+!tests/fixtures/*.pdf

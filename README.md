@@ -1,208 +1,77 @@
 # Career Portfolio Intelligence Agent
 
-An AI-powered career analysis tool that evaluates a candidate’s **CV, GitHub portfolio, and target role** to generate actionable career improvement insights.
-
-The system uses a **FastAPI backend + LLM reasoning + Streamlit UI** to produce a structured career strategy report including skill gaps, portfolio feedback, resume improvements, and a 30-day learning roadmap.
-
----
+An AI-powered career analysis tool that evaluates a candidate's **CV, GitHub portfolio, and target role** to generate actionable career improvement insights: profile scores, skill gaps, portfolio feedback, resume improvements, and a 30-day learning roadmap.
 
 ## Features
 
 - CV analysis from uploaded **PDF resumes**
 - GitHub portfolio evaluation
 - Role-agnostic career recommendations
-- Structured career strategy output
-- Automated learning roadmap
-- Clean Streamlit dashboard interface
-
----
+- Structured career strategy output with readiness scores
+- Automated 30-day learning roadmap
+- Streamlit dashboard and a FastAPI HTTP API
 
 ## Architecture
-# Career Portfolio Intelligence Agent
 
-An AI-powered career analysis tool that evaluates a candidate’s **CV, GitHub portfolio, and target role** to generate actionable career improvement insights.
+```
+Streamlit UI (streamlit_app/)      FastAPI (api/)  POST /analyze
+            \                       /
+             \                     /
+          career_agent.core.pipeline.analyze_profile   (src/career_agent/)
+             |                     |
+     GitHub REST API          Groq LLM (default: openai/gpt-oss-120b)
+```
 
-The system uses a **FastAPI backend + LLM reasoning + Streamlit UI** to produce a structured career strategy report including skill gaps, portfolio feedback, resume improvements, and a 30-day learning roadmap.
-
----
-
-## Features
-
-- CV analysis from uploaded **PDF resumes**
-- GitHub portfolio evaluation
-- Role-agnostic career recommendations
-- Structured career strategy output
-- Automated learning roadmap
-- Clean Streamlit dashboard interface
-
----
-
-## Architecture
-Streamlit UI
-│
-│ POST /analyze
-▼
-FastAPI Backend
-│
-├── CV Analysis
-├── GitHub Portfolio Analysis
-└── Career Strategy Agent
-│
-▼
-LLM (Groq / Moonshot)
-
-
----
-
-## Project Structure
-
-
-career_intelligence_agent
-│
-├── backend
-│ └── app
-│ ├── agents
-│ │ └── career_agent.py
-│ ├── services
-│ │ ├── groq_service.py
-│ │ └── github_service.py
-│ ├── models
-│ ├── utils
-│ └── main.py
-│
-├── streamlit_app
-│ └── app.py
-│
-├── .gitignore
-├── README.md
-└── requirements.txt
-
-
----
+Both front ends are thin adapters that call the same core library in-process.
 
 ## Setup
 
-### 1️⃣ Clone the repository
-
-
-git clone https://github.com/your-username/career-intelligence-agent.git
-
-cd career-intelligence-agent
-
-
----
-
-### 2️⃣ Create a virtual environment
-
+```bash
+git clone https://github.com/Fastpacer/Career-Portfolio-Intelligence-Agent.git
+cd Career-Portfolio-Intelligence-Agent
 
 python -m venv venv
+venv\Scripts\activate          # Windows
+source venv/bin/activate       # macOS / Linux
 
+pip install -e ".[dev]"        # app + API + UI + test/lint tooling
+cp .env.example .env           # then set GROQ_API_KEY
+```
 
-Activate it:
+### Configuration
 
-Windows
+`.env` lives in the repo root and is found regardless of the directory you launch from. Only `GROQ_API_KEY` is required; see `.env.example` for all options.
 
-venv\Scripts\activate
+- `MODEL_NAME`: defaults to `openai/gpt-oss-120b`, a reasoning model.
+- `LLM_REASONING_EFFORT`: `low` | `medium` (default) | `high`. Set it to `none` if you switch to a non-reasoning model.
+- `LLM_MAX_TOKENS`: defaults to 8192. It must cover hidden reasoning plus the report. A truncation warning is logged if the budget is hit.
 
+If the key is missing, the UI shows a configuration message and the API returns `503`.
 
-Mac/Linux
+## Running
 
-source venv/bin/activate
+```bash
+streamlit run streamlit_app/app.py      # UI  → http://localhost:8501
+python -m api                           # API → http://127.0.0.1:8000 (docs at /docs)
+```
 
+## Development
 
----
+```bash
+pytest                                   # all tests (no network or API key needed)
+pytest tests/test_api.py::test_root      # single test
+ruff check . && ruff format .            # lint + format
+pre-commit install                       # optional git hooks
+```
 
-### 3️⃣ Install dependencies
+## Deployment (Streamlit Community Cloud)
 
-
-pip install -r requirements.txt
-
-
----
-
-### 4️⃣ Configure environment variables
-
-Create a `.env` file in the **backend folder**.
-
-Example:
-
-
-GROQ_API_KEY=your_api_key_here
-MODEL_NAME=moonshot
-GITHUB_API_URL=https://api.github.com
-
-
----
-
-## Running the Application
-
-### Start the backend
-
-
-cd backend
-uvicorn app.main:app --reload
-
-
-Backend will run at:
-
-
-http://127.0.0.1:8000
-
-
----
-
-### Start the Streamlit UI
-
-Open another terminal:
-
-
-cd streamlit_app
-streamlit run app.py
-
-
-Streamlit UI will run at:
-
-
-http://localhost:8501
-
-
----
-
-## Example Workflow
-
-1. Upload a CV PDF
-2. Enter GitHub username
-3. Enter target role
-4. Click **Analyze Profile**
-
-The AI agent generates:
-
-- Skill gap analysis
-- Portfolio improvement suggestions
-- Resume feedback
-- 30-day learning roadmap
-
----
+Main file: `streamlit_app/app.py`. Cloud installs from `requirements.txt` (pinned, and installs this package via `.`). Add `GROQ_API_KEY` under the app's **Secrets**.
 
 ## Tech Stack
 
-- **FastAPI** – backend API
-- **Streamlit** – UI dashboard
-- **Groq / Moonshot LLM** – reasoning engine
-- **GitHub API** – portfolio analysis
-- **pdfplumber** – CV parsing
-
----
-
-## Future Improvements
-
-- deeper GitHub repository analysis (README + code signals)
-- skill extraction from CV
-- project difficulty scoring
-- interactive learning roadmap tracking
-
----
+FastAPI · Streamlit · Groq · GitHub REST API · pdfplumber · pydantic-settings · loguru
 
 ## License
 
-MIT License
+MIT
