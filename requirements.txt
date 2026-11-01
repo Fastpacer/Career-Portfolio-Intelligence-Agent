@@ -1,9 +1,11 @@
-fastapi
-uvicorn
-streamlit
-groq
-requests
-pdfplumber
-python-dotenv
-pydantic
-loguru
+# Deployment lockfile for Streamlit Community Cloud (installs from the repo root).
+# Source of truth for dependency ranges is pyproject.toml; keep these pins inside those ranges.
+groq==1.7.0
+requests==2.34.2
+pdfplumber==0.11.10
+pydantic==2.14.2
+pydantic-settings==2.16.2
+loguru==0.7.3
+streamlit==1.66.1
+# Installs the career_agent package itself (src/ layout).
+.
